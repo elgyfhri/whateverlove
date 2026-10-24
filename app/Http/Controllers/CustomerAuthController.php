@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class CustomerAuthController extends Controller
 {
@@ -95,17 +96,25 @@ class CustomerAuthController extends Controller
         return back()->with('status', 'verification-link-sent');
     }
 
-    public function verifyEmail(Request $request, string $id, string $hash)
+    public function verifyEmailCode(Request $request)
     {
-        $user = User::findOrFail($id);
+        $data = $request->validate([
+            'code' => ['required', 'digits:6'],
+        ]);
+        $user = $request->user();
 
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            abort(403);
+        if (!$user->email_verification_expires_at || now()->greaterThan($user->email_verification_expires_at) || !Hash::check($data['code'], $user->email_verification_code)) {
+            throw ValidationException::withMessages(['code' => 'Kode salah atau sudah kedaluwarsa.']);
         }
 
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
+
+        $user->forceFill([
+            'email_verification_code' => null,
+            'email_verification_expires_at' => null,
+        ])->save();
 
         return redirect()->intended(route('catalog'))->with('verified', true);
     }

@@ -3,6 +3,7 @@
 @section('title', 'Detail Pesanan')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <section class="py-16 px-6 md:px-12 max-w-[1440px] mx-auto">
     <div class="max-w-3xl mx-auto">
         <a href="{{ route('orders.index') }}" class="inline-flex items-center gap-2 text-xs font-label-sm uppercase tracking-widest text-gray-500 hover:text-black transition-colors mb-8">
@@ -81,8 +82,14 @@
                 @endforeach
             </div>
             <p class="text-xs text-gray-400 mt-4 font-label-sm">
-                Estimasi pengiriman: {{ $order->shippingEtaLabel() }} · {{ $order->shipping_courier ? strtoupper($order->shipping_courier) . ' ' . $order->shipping_service : '—' }}
-            </p>
+                 Estimasi pengiriman: {{ $order->shippingEtaLabel() }} · {{ $order->shipping_courier ? strtoupper($order->shipping_courier) . ' ' . $order->shipping_service : '—' }}
+             </p>
+             @if($order->status === 'shipped' && $order->tracking_number)
+                 <div class="mt-5 flex flex-col sm:flex-row gap-3">
+                     <a href="https://www.jne.co.id/tracking-package" target="_blank" rel="noopener" class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-black text-white rounded-full font-bold uppercase text-[10px] tracking-widest">Cek Tracking JNE <span class="material-symbols-outlined text-sm">open_in_new</span></a>
+                     <form method="POST" action="{{ route('orders.received', $order) }}" class="flex-1 confirm-received-form">@csrf @method('PATCH')<button type="submit" class="w-full px-5 py-3 border border-gray-300 rounded-full font-bold uppercase text-[10px] tracking-widest hover:border-black">Pesanan Sudah Diterima</button></form>
+                 </div>
+             @endif
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
@@ -243,4 +250,24 @@
         </div>
     </div>
 </section>
+
+<script>
+document.querySelectorAll('.confirm-received-form').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Pesanan sudah diterima?',
+            text: 'Status pesanan akan diubah menjadi Diterima.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#111111',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, sudah diterima',
+            cancelButtonText: 'Batal'
+        }).then(function (result) {
+            if (result.isConfirmed) form.submit();
+        });
+    });
+});
+</script>
 @endsection

@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\ProductSize;
-use App\Services\MidtransService;
 use App\Services\RajaOngkirService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Laravolt\Indonesia\Models\City;
 use Laravolt\Indonesia\Models\District;
 use Laravolt\Indonesia\Models\Province;
@@ -236,36 +234,9 @@ if (!$this->provinceAllowed($province->code)) {
             'total' => $subtotal + $shipping['cost'],
         ]);
 
-        if (app(MidtransService::class)->enabled()) {
-            $order->load('items');
+        $order->load('items');
 
-            try {
-                $service = app(MidtransService::class);
-                $snap = $service->createTransaction($service->payloadFor($order));
-
-                $order->update([
-                    'payment_status' => 'pending',
-                    'payment_reference' => $snap['token'] ?? null,
-                    'payment_redirect_url' => $snap['redirect_url'] ?? null,
-                    'payment_raw' => json_encode($snap),
-                ]);
-
-                if (!empty($snap['redirect_url'])) {
-                    return redirect()->away($snap['redirect_url']);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Midtrans checkout failed', [
-                    'order' => $order->invoice_no,
-                    'message' => $e->getMessage(),
-                ]);
-
-                return redirect()->route('checkout.success', $order)
-                    ->with('error', 'Gateway pembayaran sedang bermasalah. Pesanan tetap tercatat; silakan bayar lewat halaman Contact Us.');
-            }
-        }
-
-        return redirect()->route('checkout.success', $order)
-            ->with('success', 'Pesanan berhasil dibuat.');
+        return redirect()->away($this->whatsappUrl($order));
     }
 
     public function success(Order $order)
@@ -275,6 +246,58 @@ if (!$this->provinceAllowed($province->code)) {
         $order->load('items');
 
         return view('order-success', compact('order'));
+    }
+
+    private function whatsappUrl(Order $order): string
+    {
+        $lines = [
+            'Halo Admin, saya ingin memesan produk.',
+            '',
+            'Kode Pesanan : '.$order->invoice_no,
+            'Tanggal      : '.$order->created_at->format('d/m/Y H:i'),
+            '',
+            'DATA PEMBELI',
+            '====================',
+            'Nama         : '.$order->name,
+            'No. WhatsApp : '.$order->phone,
+            'Email        : '.$order->email,
+            '',
+            'DETAIL PESANAN',
+            '====================',
+        ];
+
+        foreach ($order->items as $index => $item) {
+            $lines[] = ($index + 1).'. '.$item->product_name;
+            $lines[] = '   Ukuran     : '.($item->size ?: '-');
+            $lines[] = '   Jumlah     : '.$item->qty.' pcs';
+            $lines[] = '   Harga      : IDR '.number_format($item->price * $item->qty, 0, ',', '.');
+        }
+
+        $lines[] = '';
+        $lines[] = 'RINGKASAN HARGA';
+        $lines[] = '====================';
+        $lines[] = 'Subtotal     : IDR '.number_format($order->subtotal, 0, ',', '.');
+        $lines[] = 'Ongkos Kirim : IDR '.number_format($order->shipping_cost, 0, ',', '.');
+        $lines[] = 'TOTAL        : IDR '.number_format($order->total, 0, ',', '.');
+        $lines[] = '';
+        $lines[] = 'ALAMAT PENGIRIMAN';
+        $lines[] = '====================';
+        $lines[] = $order->address;
+        $lines[] = $order->district_name.', '.$order->city_name.', '.$order->province_name;
+        if ($order->postal_code) {
+            $lines[] = 'Kode Pos     : '.$order->postal_code;
+        }
+        if ($order->shipping_courier) {
+            $lines[] = 'Kurir        : '.strtoupper($order->shipping_courier).' '.$order->shipping_service;
+        }
+        if ($order->note) {
+            $lines[] = '';
+            $lines[] = 'Catatan      : '.$order->note;
+        }
+        $lines[] = '';
+        $lines[] = 'Mohon konfirmasi pembayaran dan proses pesanan ini. Terima kasih.';
+
+        return 'https://wa.me/'.preg_replace('/\\D+/', '', (string) config('services.whatsapp.admin_number')).'?text='.rawurlencode(implode("\n", $lines));
     }
 
     private function cart(): Cart
@@ -322,7 +345,7 @@ if (!$this->provinceAllowed($province->code)) {
                 'code' => (string) ($cost['code'] ?? ''),
                 'service' => (string) ($cost['service'] ?? ''),
                 'description' => (string) ($cost['description'] ?? ''),
-                'cost' => (int) ($cost['cost'] ?? 0),
+                'cost' => (int) ($cost['cost'] ?? 0) + (int) config('rajaongkir.price_surcharge', 5000),
                 'etd' => (string) ($cost['etd'] ?? ''),
             ];
         }
@@ -388,7 +411,7 @@ if (!$this->provinceAllowed($province->code)) {
         }
 
         return [
-            'cost' => (int) ($match['cost'] ?? 0),
+            'cost' => (int) ($match['cost'] ?? 0) + (int) config('rajaongkir.price_surcharge', 5000),
             'courier' => ($match['code'] ?? null) ? (string) $match['code'] : null,
             'service' => ($match['service'] ?? null) ? (string) $match['service'] : null,
             'estimate' => ($match['etd'] ?? null) ? (string) $match['etd'] : null,

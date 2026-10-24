@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SiteSetting;
+
 class InformationController extends Controller
 {
     public function index()
@@ -24,21 +26,23 @@ class InformationController extends Controller
         return view('information_show', compact('topic', 'topics'));
     }
 
-    private static function topics(): array
+    public static function topics(): array
     {
-        return [
+        $topics = [
             'how-to-order' => [
                 'icon' => 'shopping_bag',
                 'title' => 'How to Order',
                 'note' => 'Panduan belanja',
-                'description' => 'Langkah mudah memesan produk WHATEVERLOVE langsung dari website: pilih produk, checkout, bayar online, sampai pesanan tiba.',
+                'description' => 'Langkah mudah memesan produk WHATEVERLOVE: pilih produk, checkout, kirim detail pesanan ke WhatsApp admin, lakukan pembayaran setelah mendapat konfirmasi, lalu pantau proses pesanan sampai tiba.',
                 'sections' => [
                     ['heading' => '1. Pilih Produk & Tambah ke Keranjang', 'body' => 'Jelajahi katalog kami melalui menu CATALOG atau lewat halaman Lookbook dan Article. Di halaman produk, pilih ukuran dan jumlah, lalu tekan tombol tambah ke keranjang (icon tas). Daftar belanjaanmu bisa dicek lewat ikon tas di navbar atau halaman Cart.'],
                     ['heading' => '2. Checkout & Isi Alamat', 'body' => 'Tekan tombol Checkout. Pastikan kamu sudah login dengan akun terverifikasi. Isi nama, nomor HP/WhatsApp, dan alamat lengkap, kemudian pilih provinsi, kota, dan kecamatan. Ongkos kirim dihitung otomatis oleh sistem.'],
                     ['heading' => '3. Pilih Pengiriman JNE', 'body' => 'Setelah kecamatan dipilih, muncul pilihan layanan JNE (misalnya REG, YES, JTR) lengkap dengan biaya dan estimasi perjalanan (ETD). Estimasi dihitung sejak paket dikirim dari Bogor, dan sudah termasuk hari cadangan supaya paket cenderung datang lebih cepat dari perkiraan.'],
-                    ['heading' => '4. Bayar Online', 'body' => 'Kamu akan diarahkan ke halaman pembayaran aman Midtrans untuk menyelesaikan pembayaran, misalnya dengan kartu debit/kredit. Begitu pembayaran tercatat, status otomatis berubah menjadi "Pembayaran Dikonfirmasi".'],
-                    ['heading' => '5. Pesanan Dikemas & Dikirim', 'body' => 'Tim kami mengemas pesananmu dengan hati-hati (umumnya 1-3 hari kerja). Nomor resi JNE akan dimasukkan oleh admin dan langsung tampil di halaman pesananmu.'],
-                    ['heading' => '6. Lacak Sampai Tiba', 'body' => 'Pantau status pesanan kapan saja lewat menu PESANAN di navbar. Ada kendala? Hubungi kami lewat halaman Contact Us dan tim kami siap membantu.'],
+                    ['heading' => '4. Kirim Pesanan ke WhatsApp Admin', 'body' => 'Setelah checkout selesai, kamu akan diarahkan ke WhatsApp admin. Pesan otomatis berisi kode pesanan, produk, ukuran, jumlah, total harga, dan alamat pengiriman. Pastikan semua data sudah benar sebelum mengirim pesan.'],
+                    ['heading' => '5. Lakukan Pembayaran', 'body' => 'Admin akan membalas pesan WhatsApp untuk mengonfirmasi pesanan dan memberikan informasi pembayaran. Lakukan pembayaran sesuai instruksi admin, lalu kirim bukti pembayaran melalui WhatsApp dengan mencantumkan kode pesanan.'],
+                    ['heading' => '6. Pesanan Diproses & Dikemas', 'body' => 'Setelah pembayaran dikonfirmasi admin, status pesanan berubah menjadi Diproses / Dikemas. Tim kami menyiapkan pesananmu dengan hati-hati.'],
+                    ['heading' => '7. Pesanan Dikirim', 'body' => 'Setelah paket dikirim, admin akan memperbarui status menjadi Dikirim dan menambahkan nomor resi jika tersedia.'],
+                    ['heading' => '8. Lacak Sampai Tiba', 'body' => 'Pantau status pesanan kapan saja lewat menu PESANAN di navbar. Setelah paket sampai, status pesanan akan diperbarui menjadi Diterima. Ada kendala? Hubungi kami lewat halaman Contact Us dan tim kami siap membantu.'],
                 ],
             ],
             'faq' => [
@@ -67,5 +71,15 @@ class InformationController extends Controller
                 ],
             ],
         ];
+
+        $custom = json_decode(SiteSetting::get('information_topics', '{}'), true);
+        foreach (['how-to-order', 'faq', 'refund-return'] as $slug) {
+            if (! empty($custom[$slug])) {
+                $topics[$slug]['description'] = $custom[$slug]['description'] ?? $topics[$slug]['description'];
+                $topics[$slug]['sections'] = $custom[$slug]['sections'] ?? $topics[$slug]['sections'];
+            }
+        }
+
+        return $topics;
     }
 }

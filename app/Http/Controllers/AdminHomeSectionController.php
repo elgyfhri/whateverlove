@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HomeSection;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,8 +20,30 @@ class AdminHomeSectionController extends Controller
         $this->ensureDefaults();
 
         $sections = HomeSection::orderBy('sort_order')->orderBy('id')->get();
+        $heroImage = SiteSetting::get('hero_image', 'assets/hero.jpg');
+        $aboutText = SiteSetting::get('about_text', 'WHATEVERLOVE represents a space where we can express our creativity in total freedom, doing what we love, without having to worry about all the rules of the fashion industry.');
 
-        return view('admin.home-sections.index', compact('sections'));
+        return view('admin.home-sections.index', compact('sections', 'heroImage', 'aboutText'));
+    }
+
+    public function updateHomepage(Request $request)
+    {
+        $data = $request->validate([
+            'about_text' => ['required', 'string', 'max:5000'],
+            'hero_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:4096'],
+        ]);
+
+        SiteSetting::put('about_text', $data['about_text']);
+
+        if ($request->hasFile('hero_image')) {
+            $old = SiteSetting::get('hero_image');
+            if ($old && ! str_starts_with($old, 'assets/')) {
+                Storage::disk('public')->delete($old);
+            }
+            SiteSetting::put('hero_image', $request->file('hero_image')->store('homepage', 'public'));
+        }
+
+        return redirect()->route('admin.home-sections.index')->with('success', 'Homepage berhasil diupdate.');
     }
 
     public function update(Request $request, HomeSection $section)

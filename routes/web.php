@@ -18,6 +18,7 @@ use App\Http\Controllers\LookbookController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AdminHomeSectionController;
+use App\Http\Controllers\AdminWebAppearanceController;
 use App\Http\Controllers\AdminLookController;
 use App\Http\Controllers\AdminOrderController;
 use Illuminate\Support\Facades\Route;
@@ -54,8 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/email/resend', [CustomerAuthController::class, 'resendVerification'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
-    Route::get('/email/verify/{id}/{hash}', [CustomerAuthController::class, 'verifyEmail'])
-        ->middleware('signed')
+    Route::post('/email/verify', [CustomerAuthController::class, 'verifyEmailCode'])
         ->name('verification.verify');
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index'])->middleware('verified')->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->middleware('verified')->name('orders.show');
+    Route::patch('/orders/{order}/received', [OrderController::class, 'confirmReceived'])->middleware('verified')->name('orders.received');
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('verified')->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('verified')->name('checkout.store');
@@ -123,7 +124,12 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->name('admin.')->grou
     Route::delete('/looks/{look}', [AdminLookController::class, 'destroy'])->name('looks.destroy');
 
     Route::get('/home-sections', [AdminHomeSectionController::class, 'index'])->name('home-sections.index');
+    Route::put('/home-sections/homepage', [AdminHomeSectionController::class, 'updateHomepage'])->name('home-sections.homepage');
     Route::put('/home-sections/{section}', [AdminHomeSectionController::class, 'update'])->name('home-sections.update');
+    Route::get('/web-appearance/contact', [AdminWebAppearanceController::class, 'contact'])->name('web.contact');
+    Route::put('/web-appearance/contact', [AdminWebAppearanceController::class, 'updateContact'])->name('web.contact.update');
+    Route::get('/web-appearance/information', [AdminWebAppearanceController::class, 'information'])->name('web.information');
+    Route::put('/web-appearance/information', [AdminWebAppearanceController::class, 'updateInformation'])->name('web.information.update');
 
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');

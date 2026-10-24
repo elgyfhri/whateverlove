@@ -114,7 +114,14 @@
                 @csrf
                 @method('PATCH')
 
-                <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-700 mb-2">Status</label>
+                <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-700 mb-2">Status Pembayaran</label>
+                <select name="payment_status" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:border-black focus:outline-none">
+                    @foreach(['pending' => 'Menunggu Pembayaran', 'paid' => 'Sudah Dibayar', 'failed' => 'Gagal', 'cancelled' => 'Dibatalkan'] as $val => $label)
+                        <option value="{{ $val }}" @if($order->payment_status === $val) selected @endif>{{ $label }}</option>
+                    @endforeach
+                </select>
+
+                <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-700 mb-2 mt-5">Status Pesanan</label>
                 <select name="status" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-white focus:border-black focus:outline-none">
                     @foreach(['pending' => 'Pending', 'processing' => 'Diproses / Dikemas', 'shipped' => 'Dikirim', 'delivered' => 'Diterima', 'cancelled' => 'Dibatalkan'] as $val => $label)
                         <option value="{{ $val }}" @if($order->status === $val) selected @endif>{{ $label }}</option>
@@ -126,7 +133,11 @@
                     class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-black focus:outline-none"
                     placeholder="mis. JNE0090012345001">
 
-                <button type="submit" class="mt-6 w-full bg-black text-white font-bold uppercase text-xs tracking-widest py-3.5 rounded-lg hover:opacity-80 transition">
+                 @if($order->tracking_number)
+                     <a href="https://www.jne.co.id/tracking-package" target="_blank" rel="noopener" class="mt-3 w-full inline-flex items-center justify-center gap-2 border border-gray-300 text-gray-700 font-bold uppercase text-[10px] tracking-widest py-3 rounded-lg hover:border-black">Cek Tracking JNE <span class="material-symbols-outlined text-sm">open_in_new</span></a>
+                 @endif
+
+                 <button type="submit" class="mt-6 w-full bg-black text-white font-bold uppercase text-xs tracking-widest py-3.5 rounded-lg hover:opacity-80 transition">
                     Simpan
                 </button>
             </form>

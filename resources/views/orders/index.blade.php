@@ -39,14 +39,21 @@
                                 </div>
                                 <span class="text-xs text-gray-400 font-label-sm">{{ $order->created_at->format('d M Y, H:i') }}</span>
                             </div>
-                            <span class="font-label-sm text-[10px] uppercase tracking-widest px-3 py-1 rounded-full @if($order->payment_status === 'paid') bg-green-50 text-green-600 @elseif($order->payment_status === 'failed') bg-red-50 text-red-600 @elseif($order->payment_status === 'expired' || $order->payment_status === 'cancelled') bg-gray-100 text-gray-500 @else bg-amber-50 text-amber-600 @endif">
-                                @if($order->payment_status === 'paid') Dibayar
-                                @elseif($order->payment_status === 'pending') Menunggu Pembayaran
-                                @elseif($order->payment_status === 'failed') Pembayaran Gagal
-                                @elseif($order->payment_status === 'expired') Kedaluwarsa
-                                @elseif($order->payment_status === 'cancelled') Dibatalkan
-                                @else {{ $order->payment_status }} @endif
-                            </span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-label-sm text-[10px] uppercase tracking-widest px-3 py-1 rounded-full @if($order->payment_status === 'paid') bg-green-50 text-green-600 @elseif($order->payment_status === 'failed') bg-red-50 text-red-600 @elseif($order->payment_status === 'expired' || $order->payment_status === 'cancelled') bg-gray-100 text-gray-500 @else bg-amber-50 text-amber-600 @endif">
+                                    @if($order->payment_status === 'paid') Dibayar
+                                    @elseif($order->payment_status === 'pending') Menunggu Pembayaran
+                                    @elseif($order->payment_status === 'failed') Pembayaran Gagal
+                                    @elseif($order->payment_status === 'expired') Kedaluwarsa
+                                    @elseif($order->payment_status === 'cancelled') Dibatalkan
+                                    @else {{ $order->payment_status }} @endif
+                                </span>
+                                @if($order->payment_status === 'paid' || $order->status !== 'pending')
+                                    <span class="font-label-sm text-[10px] uppercase tracking-widest px-3 py-1 rounded-full @if($order->status === 'processing') bg-blue-50 text-blue-600 @elseif($order->status === 'shipped') bg-indigo-50 text-indigo-600 @elseif($order->status === 'delivered') bg-green-50 text-green-600 @elseif($order->status === 'cancelled') bg-gray-100 text-gray-500 @else bg-amber-50 text-amber-600 @endif">
+                                        {{ $order->statusLabel() }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -74,7 +81,7 @@
                                     <p class="font-label-sm text-[10px] uppercase tracking-widest text-gray-400">Total</p>
                                     <p class="font-headline-lg font-extrabold">IDR {{ number_format($order->total, 0, '.', '.') }}</p>
                                 </div>
-                                @if($order->payment_status === 'pending' && $order->payment_redirect_url)
+                                @if($order->payment_status === 'pending' && $order->status === 'pending' && $order->payment_redirect_url)
                                     <a href="{{ route('payment.return', ['order' => $order]) }}" onclick="event.preventDefault(); window.open('{{ $order->payment_redirect_url }}', '_blank', 'noopener');" class="px-5 py-2.5 bg-black text-white font-bold uppercase text-xs tracking-widest rounded-full hover:opacity-80 transition">Bayar</a>
                                 @endif
                                 <a href="{{ route('orders.show', $order) }}" class="px-5 py-2.5 text-gray-600 font-label-sm text-xs uppercase tracking-widest rounded-full border border-gray-300 hover:border-black transition">Detail</a>

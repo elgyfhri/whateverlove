@@ -62,9 +62,9 @@
         <a class="font-label-sm uppercase tracking-wider text-xs {{ request()->routeIs('lookbook') || request()->routeIs('lookbook.show') ? 'text-black font-bold border-b-2 border-black pb-1' : 'text-gray-700 font-medium hover:text-black transition-colors' }}" href="{{ route('lookbook') }}">LOOKBOOK</a>
         <a class="font-label-sm uppercase tracking-wider text-xs {{ request()->routeIs('orders.index') || request()->routeIs('orders.show') ? 'text-black font-bold border-b-2 border-black pb-1' : 'text-gray-700 font-medium hover:text-black transition-colors' }}" href="{{ route('orders.index') }}">PESANAN</a>
       </nav>
+      <button id="mobileMenuBtn" type="button" class="md:hidden material-symbols-outlined text-xl" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu">menu</button>
     </div>
     <div class="flex gap-5 items-center text-black">
-      <a class="material-symbols-outlined text-xl hover:opacity-70 transition-opacity" href="{{ route('catalog') }}">search</a>
       @auth
         <div class="relative">
           <button id="accountBtn" class="material-symbols-outlined text-xl hover:opacity-70 transition-opacity cursor-pointer" aria-label="Account">person</button>
@@ -89,6 +89,15 @@
     </div>
   </header>
 
+  <nav id="mobileMenu" class="hidden fixed top-[73px] left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-sm px-6 py-5 md:hidden">
+    <div class="flex flex-col gap-5 font-label-sm text-xs uppercase tracking-wider">
+      <a href="{{ route('catalog') }}">Catalog</a>
+      <a href="{{ route('article') }}">Article</a>
+      <a href="{{ route('lookbook') }}">Lookbook</a>
+      <a href="{{ route('orders.index') }}">Pesanan</a>
+    </div>
+  </nav>
+
   <!-- Main -->
   <main class="pt-20">
     @yield('content')
@@ -107,8 +116,8 @@
       <div>
         <h5 class="text-gray-200 font-bold mb-4 font-label-sm uppercase tracking-widest text-xs">About</h5>
         <ul class="space-y-2 text-xs text-gray-400 font-label-sm uppercase">
-          <li><a class="hover:text-white transition-colors" href="/#about">Our Story</a></li>
-          <li><a class="hover:text-white transition-colors" href="{{ route('catalog') }}">The Collection</a></li>
+          <li><a class="hover:text-white transition-colors" href="/#about">ABOUT WHATEVERLOVE</a></li>
+          <li><a class="hover:text-white transition-colors" href="{{ route('catalog') }}">Article</a></li>
         </ul>
       </div>
 
@@ -325,6 +334,14 @@
                 if (!menu.contains(e.target)) menu.classList.add('hidden');
             });
         })();
+
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn?.addEventListener('click', function () {
+            const open = !mobileMenu.classList.toggle('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', String(open));
+            mobileMenuBtn.textContent = open ? 'close' : 'menu';
+        });
     })();
 </script>
 </body>

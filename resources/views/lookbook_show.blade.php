@@ -23,11 +23,11 @@
 @endphp
 <section class="pb-10">
     <div id="lookSlider" class="relative">
-        <div class="relative bg-[#111111] overflow-hidden select-none">
+        <div class="relative bg-[#f8f8f8] overflow-hidden select-none">
             <div class="aspect-[4/3] md:aspect-[21/10]">
                 <div id="sliderTrack" class="flex h-full w-full transition-transform duration-300 ease-out">
                     @foreach($slideImages as $slideImage)
-                        <img src="{{ $slideImage }}" alt="{{ $look->name }}" class="w-full h-full flex-shrink-0 object-cover" draggable="false">
+                        <img src="{{ $slideImage }}" alt="{{ $look->name }}" class="w-full h-full flex-shrink-0 object-contain" draggable="false">
                     @endforeach
                 </div>
             </div>

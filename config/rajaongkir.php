@@ -36,5 +36,7 @@ return [
     | Provinsi tujuan yang diizinkan (kode dipisah koma).
     | Kosongkan untuk mengizinkan semua provinsi.
     */
-    'allowed_provinces' => array_values(array_filter(array_map('trim', explode(',', (string) env('RAJAONGKIR_PROVINCES', '31,32'))))),
+    'allowed_provinces' => array_values(array_filter(array_map('trim', explode(',', (string) env('RAJAONGKIR_PROVINCES', ''))))),
+
+    'price_surcharge' => 5000,
 ];

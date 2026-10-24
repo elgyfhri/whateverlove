@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Illuminate\Http\RedirectResponse;
 
 class OrderController extends Controller
 {
@@ -14,6 +15,22 @@ class OrderController extends Controller
             ->paginate(10);
 
         return view('orders.index', compact('orders'));
+    }
+
+    public function confirmReceived(Order $order): RedirectResponse
+    {
+        abort_unless($order->user_id === auth()->id(), 404);
+
+        if ($order->status !== 'shipped') {
+            return back()->with('error', 'Pesanan belum berstatus dikirim.');
+        }
+
+        $order->update([
+            'status' => 'delivered',
+            'delivered_at' => $order->delivered_at ?? now(),
+        ]);
+
+        return back()->with('success', 'Pesanan dikonfirmasi sudah diterima.');
     }
 
     public function show(Order $order)

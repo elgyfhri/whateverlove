@@ -27,7 +27,7 @@
             @foreach($looks as $look)
                 <a href="{{ route('lookbook.show', $look) }}" class="group cursor-pointer">
                     <div class="relative aspect-[3/2] overflow-hidden rounded-lg bg-[#f8f8f8]">
-                        <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+                        <div class="absolute inset-0 bg-contain md:bg-cover bg-center bg-no-repeat group-hover:scale-105 transition-transform duration-700"
                             style="background-image: url('{{ $look->cover_url }}')"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                        

@@ -9,11 +9,20 @@ use Illuminate\View\View;
 
 class AdminOrderController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $search = trim((string) $request->query('search'));
         $orders = Order::with(['user', 'items'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('invoice_no', 'like', '%'.$search.'%')
+                        ->orWhere('name', 'like', '%'.$search.'%')
+                        ->orWhere('phone', 'like', '%'.$search.'%');
+                });
+            })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.orders.index', compact('orders'));
     }
@@ -36,10 +45,17 @@ class AdminOrderController extends Controller
     {
         $data = $request->validate([
             'status' => ['required', 'string', 'in:pending,processing,shipped,delivered,cancelled'],
+            'payment_status' => ['required', 'string', 'in:pending,paid,failed,cancelled'],
             'tracking_number' => ['nullable', 'string', 'max:64'],
         ]);
 
+        if (in_array($data['status'], ['processing', 'shipped', 'delivered'], true) && $data['payment_status'] !== 'paid') {
+            return back()->withErrors(['payment_status' => 'Konfirmasi pembayaran sebelum memproses pesanan.'])->withInput();
+        }
+
         $order->status = $data['status'];
+        $order->payment_status = $data['payment_status'];
+        $order->paid_at = $data['payment_status'] === 'paid' ? ($order->paid_at ?? now()) : null;
 
         if ($data['status'] === 'shipped') {
             $order->tracking_number = $data['tracking_number'] ?? null;

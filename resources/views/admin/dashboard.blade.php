@@ -14,52 +14,41 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-    <a href="{{ route('admin.orders.index') }}" class="bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-300 transition">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6 mb-10">
+    <a href="{{ route('admin.orders.index') }}" class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-300 transition">
         <p class="font-label-sm text-xs uppercase tracking-widest text-gray-400">Orders</p>
         <p class="mt-3 text-4xl font-extrabold font-label-sm">{{ $orderStats['total'] }}</p>
         <div class="mt-4 grid grid-cols-3 gap-2">
             <div class="rounded-xl bg-amber-50 px-3 py-2.5">
                 <p class="text-lg font-extrabold font-label-sm text-amber-600">{{ $orderStats['pending'] }}</p>
-                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">Menunggu Bayar</p>
+                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5 whitespace-nowrap">Menunggu Bayar</p>
             </div>
             <div class="rounded-xl bg-blue-50 px-3 py-2.5">
                 <p class="text-lg font-extrabold font-label-sm text-blue-600">{{ $orderStats['processing'] + $orderStats['shipped'] }}</p>
-                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">Proses / Kirim</p>
+                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5 whitespace-nowrap">Proses / Kirim</p>
             </div>
             <div class="rounded-xl bg-green-50 px-3 py-2.5">
                 <p class="text-lg font-extrabold font-label-sm text-green-600">{{ $orderStats['completed'] }}</p>
-                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">Selesai</p>
+                <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5 whitespace-nowrap">Selesai</p>
             </div>
         </div>
-        <div class="mt-4 w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-lg">receipt_long</span>
-        </div>
+        <div class="mt-4 w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center"><span class="material-symbols-outlined text-lg">receipt_long</span></div>
     </a>
-</div>
-
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     <a href="{{ route('admin.products.index') }}" class="bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-300 transition">
         <p class="font-label-sm text-xs uppercase tracking-widest text-gray-400">Products</p>
         <p class="mt-3 text-4xl font-extrabold font-label-sm">{{ \App\Models\Product::count() }}</p>
         <p class="mt-2 text-xs font-label-sm text-gray-400">Aktif: <span class="text-green-600 font-bold">{{ \App\Models\Product::where('is_active', true)->count() }}</span></p>
-        <div class="mt-4 w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-lg">inventory_2</span>
-        </div>
+        <div class="mt-4 w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center"><span class="material-symbols-outlined text-lg">inventory_2</span></div>
     </a>
     <a href="{{ route('admin.categories.index') }}" class="bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-300 transition">
         <p class="font-label-sm text-xs uppercase tracking-widest text-gray-400">Categories</p>
         <p class="mt-3 text-4xl font-extrabold font-label-sm">{{ \App\Models\Category::count() }}</p>
-        <div class="mt-4 w-10 h-10 rounded-xl bg-secondary text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-lg">category</span>
-        </div>
+        <div class="mt-4 w-10 h-10 rounded-xl bg-secondary text-white flex items-center justify-center"><span class="material-symbols-outlined text-lg">category</span></div>
     </a>
     <a href="{{ route('admin.articles.index') }}" class="bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-300 transition">
         <p class="font-label-sm text-xs uppercase tracking-widest text-gray-400">Articles</p>
         <p class="mt-3 text-4xl font-extrabold font-label-sm">{{ \App\Models\Article::count() }}</p>
-        <div class="mt-4 w-10 h-10 rounded-xl bg-[#111111] text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-lg">menu_book</span>
-        </div>
+        <div class="mt-4 w-10 h-10 rounded-xl bg-[#111111] text-white flex items-center justify-center"><span class="material-symbols-outlined text-lg">menu_book</span></div>
     </a>
 </div>
 

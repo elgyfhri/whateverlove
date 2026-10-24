@@ -6,11 +6,11 @@
   <!-- Hero Section -->
   <section class="relative h-screen w-full flex items-center justify-center overflow-hidden -mt-20">
     <div class="absolute inset-0 z-0">
-      <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/hero.jpg') }}')"></div>
+      <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ str_starts_with($heroImage, 'assets/') ? asset($heroImage) : asset('storage/' . $heroImage) }}')"></div>
       <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-white"></div>
     </div>
     <div class="relative z-10 text-center px-4">
-      <h1 class="text-white font-display-xl text-5xl md:text-7xl font-extrabold tracking-tight drop-shadow-md uppercase">
+      <h1 class="text-white font-display-xl text-[clamp(2.25rem,12vw,4.5rem)] leading-none font-extrabold tracking-[-0.04em] drop-shadow-md uppercase whitespace-nowrap">
         WHATEVERLOVE
       </h1>
     </div>
@@ -79,7 +79,7 @@
   <section id="about" class="py-20 px-6 md:px-12 max-w-4xl mx-auto text-center">
     <h2 class="font-headline-lg text-2xl md:text-3xl font-extrabold uppercase tracking-tight mb-6">ABOUT WHATEVERLOVE</h2>
     <p class="text-sm md:text-base text-gray-600 leading-relaxed max-w-3xl mx-auto">
-      WHATEVERLOVE represents a space where we can express our creativity in total freedom, doing what we love, without having to worry about all the rules of the fashion industry. Trying new materials, new concepts that we think are unique, and sometimes a little crazy. Inspiration for WHATEVERLOVE came from many things, from what we saw and loved in life. There are many fashion references in our journey, from re-adopting military fashion regarding jackets to reinterpreting 80s to 2000s fashion, while other ideas emerge from films, comics, to music and arts.
+      {{ $aboutText }}
     </p>
   </section>
 

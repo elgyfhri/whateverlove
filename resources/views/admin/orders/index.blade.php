@@ -10,6 +10,11 @@
     </div>
 </div>
 
+<form method="GET" class="mb-6 flex gap-3">
+    <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari kode pesanan, nama, atau nomor HP" class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-black focus:outline-none">
+    <button class="px-5 py-3 bg-black text-white rounded-xl text-xs font-bold uppercase tracking-widest">Cari</button>
+</form>
+
 @if(session('success'))
     <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">{{ session('success') }}</div>
 @endif

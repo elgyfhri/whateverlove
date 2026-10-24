@@ -9,6 +9,25 @@
     <p class="mt-2 text-sm text-gray-500">Kelola gambar, judul, dan link dari 3 panel di bawah bagian About Us pada halaman beranda.</p>
 </div>
 
+<div class="bg-white rounded-2xl border border-gray-100 p-8 mb-8">
+    <h2 class="font-headline-lg text-xl font-extrabold uppercase tracking-tight mb-6">Homepage utama</h2>
+    <form method="POST" action="{{ route('admin.home-sections.homepage') }}" enctype="multipart/form-data" class="space-y-6">
+        @csrf
+        @method('PUT')
+        <div>
+            <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-700 mb-2">Hero Image</label>
+            <div class="relative h-48 rounded-xl overflow-hidden bg-[#f8f8f8] mb-3"><img src="{{ str_starts_with($heroImage, 'assets/') ? asset($heroImage) : asset('storage/' . $heroImage) }}" class="w-full h-full object-cover" alt="Hero"></div>
+            <input type="file" name="hero_image" accept="image/*" class="w-full text-sm file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-black file:text-white">
+        </div>
+        <div>
+            <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-700 mb-2">About WHATEVERLOVE</label>
+            <textarea name="about_text" rows="6" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:border-black focus:outline-none">{{ old('about_text', $aboutText) }}</textarea>
+        </div>
+        <button class="px-6 py-3 bg-black text-white font-bold uppercase text-xs tracking-widest rounded-full">Save Homepage</button>
+    </form>
+</div>
+
+<div class="mb-6"><h2 class="font-headline-lg text-xl font-extrabold uppercase tracking-tight">Gambar section bawah About</h2></div>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     @foreach($sections as $section)
         <div class="bg-white rounded-2xl border border-gray-100 p-8 overflow-hidden">
@@ -17,7 +36,6 @@
                 @method('PUT')
 
                 <div>
-                    <label class="block font-label-sm text-xs uppercase tracking-widest text-gray-400 mb-2">{{ $section->key }}</label>
                     <div class="relative aspect-[3/2] rounded-xl overflow-hidden bg-[#f8f8f8] mb-3">
                         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $section->cover_url }}')"></div>
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends Controller
@@ -93,7 +94,17 @@ class AdminUserController extends Controller
         }
 
         $name = $user->name;
-        $user->delete();
+
+        DB::transaction(function () use ($user): void {
+            $user->orders()->each(function ($order): void {
+                $order->items()->delete();
+                $order->delete();
+            });
+
+            $user->cart?->items()->delete();
+            $user->cart?->delete();
+            $user->delete();
+        });
 
         return redirect()->route('admin.users.index')
             ->with('success', "User {$name} berhasil dihapus.");
